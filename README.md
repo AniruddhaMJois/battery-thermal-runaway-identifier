@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ⚡ ThermoSpark — Battery Thermal Runaway Identifier 🌡️
 
 > **Real-time IoT Dashboard for early detection and isolation of battery thermal events.**
@@ -58,12 +57,4 @@ The system consists of a hardware sensing layer and a web-based visualization la
 - **Event**: ThermoSpark Hackathon 2026.
 
 ---
-
-## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 *Stay Safe. Stay Charged. ⚡*
-=======
-# battery-thermal-runaway-identifier
->>>>>>> 97e050534bd85713e809e1ccfffcb0fe3673185a
