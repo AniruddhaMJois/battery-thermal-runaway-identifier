@@ -2,7 +2,6 @@
 
 > **Real-time IoT Dashboard for early detection and isolation of battery thermal events.**
 
-Built with ❤️ by **Team IGNOVATORS** for the **ThermoSpark Hackathon 2026** at VVCE, Mysuru.
 
 ---
 
@@ -56,6 +55,7 @@ The system consists of a hardware sensing layer and a web-based visualization la
 - **College**: Vidya Vardhaka College of Engineering (VVCE), Mysuru.
 - **Event**: ThermoSpark Hackathon 2026.
 
-Built with ❤️ by **Team IGNOVATORS** for the **ThermoSpark Hackathon 2026** at VVCE, Mysuru.
+
 ---
+Built with ❤️ by **Team IGNOVATORS** for the **ThermoSpark Hackathon 2026** at VVCE, Mysuru.
 *Stay Safe. Stay Charged. ⚡*
