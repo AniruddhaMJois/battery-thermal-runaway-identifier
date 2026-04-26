@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ThermoSpark Battery Thermal Runaway Identifier — Real-time IoT dashboard by Team IGNOVATORS for early detection and isolation of battery thermal events.">
+    <title>ThermoSpark — Battery Thermal Runaway Identifier | IGNOVATORS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ═══════════════ SCAN LINES OVERLAY ═══════════════ -->
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <!-- ═══════════════ PARTICLE CANVAS ═══════════════ -->
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header id="dashboard-header">
+        <div class="header-left">
+            <div class="logo-mark">
+                <svg viewBox="0 0 48 48" class="logo-svg" aria-label="IGNOVATORS Logo">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00ff88"/>
+                            <stop offset="100%" stop-color="#00ccff"/>
+                        </linearGradient>
+                    </defs>
+                    <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <text x="24" y="28" text-anchor="middle" fill="url(#logoGrad)" font-size="14" font-family="Orbitron" font-weight="700">I</text>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>IGN<span class="accent-green">O</span>VAT<span class="accent-green">O</span>RS</h1>
+                <p class="tagline">Battery Thermal Runaway Identifier</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="hackathon-badge">
+                <span class="badge-event">THERM<span class="accent-amber">O</span>SPARK</span>
+                <span class="badge-year">HACKATHON 2026</span>
+            </div>
+            <div class="system-clock" id="systemClock">--:--:--</div>
+        </div>
+    </header>
+
+    <!-- ═══════════════ MAIN DASHBOARD ═══════════════ -->
+    <main id="dashboard-main">
+
+        <!-- ── ROW 1 ── -->
+        <div class="dashboard-grid">
+
+            <!-- KILL SWITCH STATUS -->
+            <section class="card card-killswitch" id="killSwitchCard">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h2>Kill Switch Status</h2>
+                </div>
+                <div class="killswitch-body">
+                    <div class="killswitch-indicator" id="killSwitchIndicator">
+                        <div class="indicator-ring"></div>
+                        <div class="indicator-core" id="indicatorCore"></div>
+                        <div class="indicator-pulse" id="indicatorPulse"></div>
+                    </div>
+                    <div class="killswitch-label" id="killSwitchLabel">SYSTEM SAFE</div>
+                    <div class="killswitch-sublabel" id="killSwitchSublabel">Monitored cell parameters nominal</div>
+                </div>
+                <!-- 3D Battery SVG -->
+                <div class="battery-schematic" id="batterySchematic">
+                    <svg viewBox="0 0 120 200" class="battery-svg" id="batterySvg">
+                        <defs>
+                            <linearGradient id="batteryBodyGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#2a2d35"/>
+                                <stop offset="100%" stop-color="#1a1d25"/>
+                            </linearGradient>
+                            <linearGradient id="batteryFillSafe" x1="0" y1="1" x2="0" y2="0">
+                                <stop offset="0%" stop-color="#00ff88"/>
+                                <stop offset="100%" stop-color="#00cc66"/>
+                            </linearGradient>
+                            <linearGradient id="batteryFillDanger" x1="0" y1="1" x2="0" y2="0">
+                                <stop offset="0%" stop-color="#ff3344"/>
+                                <stop offset="100%" stop-color="#ff6644"/>
+                            </linearGradient>
+                            <filter id="glowGreen" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="glowRed" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="6" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <!-- Battery terminal -->
+                        <rect x="40" y="5" width="40" height="12" rx="3" fill="#3a3d45" stroke="#555" stroke-width="1"/>
+                        <!-- Battery body -->
+                        <rect x="20" y="17" width="80" height="170" rx="8" fill="url(#batteryBodyGrad)" stroke="#444" stroke-width="2"/>
+                        <!-- Battery fill level -->
+                        <rect id="batteryFill" x="26" y="30" width="68" height="150" rx="4" fill="url(#batteryFillSafe)" opacity="0.3" filter="url(#glowGreen)"/>
+                        <!-- Internal cell lines -->
+                        <line x1="26" y1="70" x2="94" y2="70" stroke="#333" stroke-width="1" stroke-dasharray="4,3"/>
+                        <line x1="26" y1="110" x2="94" y2="110" stroke="#333" stroke-width="1" stroke-dasharray="4,3"/>
+                        <line x1="26" y1="145" x2="94" y2="145" stroke="#333" stroke-width="1" stroke-dasharray="4,3"/>
+                        <!-- + / - symbols -->
+                        <text x="60" y="56" text-anchor="middle" fill="#555" font-size="18" font-family="Orbitron">+</text>
+                        <text x="60" y="172" text-anchor="middle" fill="#555" font-size="22" font-family="Orbitron">−</text>
+                        <!-- MOSFET label -->
+                        <rect x="25" y="185" width="70" height="0" rx="2" fill="none"/>
+                    </svg>
+                    <div class="battery-label">Monitored Cell / Load</div>
+                </div>
+            </section>
+
+            <!-- TEMPERATURE GAUGE -->
+            <section class="card card-gauge" id="tempGaugeCard">
+                <div class="card-header">
+                    <span class="card-icon">🌡️</span>
+                    <h2>Battery Temperature</h2>
+                </div>
+                <div class="gauge-container">
+                    <canvas id="tempGaugeCanvas" width="320" height="200"></canvas>
+                    <div class="gauge-value" id="tempValue">--</div>
+                    <div class="gauge-unit">°C</div>
+                    <div class="gauge-range">
+                        <span>0°C</span>
+                        <span class="gauge-range-label">SAFE &lt; 60 | WARN 60-80 | CRIT &gt; 80</span>
+                        <span>120°C</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GAS / VAPOR GAUGE -->
+            <section class="card card-gauge" id="gasGaugeCard">
+                <div class="card-header">
+                    <span class="card-icon">💨</span>
+                    <h2>Electrolyte Vapor (MQ-2)</h2>
+                </div>
+                <div class="gauge-container">
+                    <canvas id="gasGaugeCanvas" width="320" height="200"></canvas>
+                    <div class="gauge-value" id="gasValue">--</div>
+                    <div class="gauge-unit">PPM</div>
+                    <div class="gauge-range">
+                        <span>0</span>
+                        <span class="gauge-range-label">SAFE &lt; 400 | WARN 400-700 | CRIT &gt; 700</span>
+                        <span>1023</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONNECT BUTTON CARD -->
+            <section class="card card-connect" id="connectCard">
+                <div class="card-header">
+                    <span class="card-icon">🔌</span>
+                    <h2>Hardware Link</h2>
+                </div>
+                <div class="connect-body">
+                    <button class="connect-btn" id="connectBtn" type="button">
+                        <span class="btn-icon">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            </svg>
+                        </span>
+                        <span class="btn-text" id="connectBtnText">Connect to ThermoSpark Hardware</span>
+                    </button>
+                    <div class="connect-status" id="connectStatus">
+                        <span class="status-dot disconnected" id="statusDot"></span>
+                        <span id="statusText">Disconnected</span>
+                    </div>
+                    <div class="connect-info">
+                        <p>Baud Rate: <strong>9600</strong></p>
+                        <p>Protocol: <strong>WebSerial API</strong></p>
+                        <p>Format: <strong>gas,temp (CSV)</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECT BRIEF -->
+            <section class="card card-brief" id="projectBrief">
+                <div class="card-header">
+                    <span class="card-icon">📋</span>
+                    <h2>Project Brief</h2>
+                </div>
+                <div class="brief-body">
+                    <div class="brief-section">
+                        <h3>🔬 Thermal Runaway Detection</h3>
+                        <p>This system monitors an external battery cell or load in real-time to detect early signs of thermal runaway. The circuit itself is powered by <strong>2× 3.7V Li-Ion batteries</strong>, while sensors watch the target cell for dangerous chain reactions — rising temperature causing further heat generation, leading to fire or explosion.</p>
+                    </div>
+                    <div class="brief-section">
+                        <h3>⚡ IRLZ44N MOSFET — Kill Switch Logic</h3>
+                        <p>The <strong>IRLZ44N N-Channel MOSFET</strong> is used as a high-speed electronic switch for load isolation. When critical thresholds are exceeded, the Arduino drives the MOSFET gate LOW, disconnecting the monitored cell/load in <strong>&lt; 1ms</strong> — far faster than any mechanical relay. Its logic-level gate threshold (1.0–2.0V) allows direct drive from Arduino's 5V GPIO.</p>
+                    </div>
+                    <div class="brief-section">
+                        <h3>🧪 MQ-2 — Early Chemical Venting Detection</h3>
+                        <p>The <strong>MQ-2 gas sensor</strong> detects volatile organic compounds and electrolyte vapors released during the early stages of cell degradation — <em>before</em> temperature spikes occur. This provides a critical early-warning layer that pure thermal monitoring cannot achieve, enabling preemptive isolation.</p>
+                    </div>
+                    <div class="brief-section">
+                        <h3>🏗️ System Architecture</h3>
+                        <p>Power: 2× 3.7V Li-Ion batteries → Arduino UNO. Sensors: MQ-2 (Analog A0) + LM35/Thermistor (Analog A1). Kill Switch: IRLZ44N MOSFET Gate (Digital Pin 7) → Monitored Cell/Load Isolation. Data transmitted via USB Serial at 9600 baud.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RAW DATA CONSOLE -->
+            <section class="card card-terminal" id="terminalCard">
+                <div class="card-header">
+                    <span class="card-icon">💻</span>
+                    <h2>Raw Data Console</h2>
+                    <button class="terminal-clear-btn" id="clearTerminal" type="button" title="Clear Console">✕</button>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                    <div class="terminal-line system-msg">[SYSTEM] ThermoSpark Dashboard v1.0 initialized</div>
+                    <div class="terminal-line system-msg">[SYSTEM] Awaiting hardware connection...</div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer id="dashboard-footer">
+        <p>© 2026 Team IGNOVATORS — VVCE, Mysuru | ThermoSpark Hackathon 2026</p>
+    </footer>
+
+    <!-- ═══════════════ ALERT MODAL ═══════════════ -->
+    <div class="alert-overlay" id="alertOverlay" role="dialog" aria-modal="true" aria-label="Thermal Alert">
+        <div class="alert-modal">
+            <div class="alert-icon">🔥</div>
+            <h2 class="alert-title">THERMAL RUNAWAY DETECTED</h2>
+            <p class="alert-message" id="alertMessage">Critical thresholds exceeded. Kill switch activated — monitored cell/load isolated.</p>
+            <button class="alert-dismiss-btn" id="alertDismiss" type="button">ACKNOWLEDGE</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
